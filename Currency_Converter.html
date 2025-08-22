@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Currency Converter</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-image: 
+      linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1))
+      url('currency1.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      max-width: 500px;
+      margin-top: 50px;
+    }
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+      color: black;
+      font-weight: bold;
+      text-align: center;
+      font-size: 1.5rem;
+      border-radius: 15px 15px 0 0;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #2870a7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .result {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .spinner-border {
+      display: none;
+    }
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        Currency Converter
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="from_currency">From Currency (e.g., USD):</label>
+          <input type="text" id="from_currency" class="form-control" value="USD">
+        </div>
+
+        <div class="form-group">
+          <label for="to_currency">To Currency (e.g., EUR):</label>
+          <input type="text" id="to_currency" class="form-control" value="EUR">
+        </div>
+
+        <div class="text-center my-3">
+          <img src="C:\Users\smdma\OneDrive\Desktop\HTML\Py\exchange.png" alt="Exchange Icon" style="width:50px; opacity: 0.8;">
+        </div>
+
+        <div class="form-group">
+          <label for="amount">Amount:</label>
+          <input type="number" id="amount" class="form-control" value="10000">
+        </div>
+
+        <button id="convert_button">Convert</button>
+
+        <div id="loading" class="spinner-border text-primary mt-3" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+
+        <div id="result" class="result">Result will appear here</div>
+        <div id="error" class="error"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("convert_button").addEventListener("click", async function () {
+      const from_currency = document.getElementById("from_currency").value.toUpperCase();
+      const to_currency = document.getElementById("to_currency").value.toUpperCase();
+      const amount = parseFloat(document.getElementById("amount").value);
+
+      if (isNaN(amount) || amount <= 0) {
+        document.getElementById("result").textContent = "";
+        document.getElementById("error").textContent = "Please enter a valid positive number for the amount.";
+        return;
+      }
+
+      document.getElementById("loading").style.display = "inline-block";
+
+      const url = `https://api.frankfurter.app/latest?from=${from_currency}&to=${to_currency}&amount=${amount}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        document.getElementById("loading").style.display = "none";
+
+        if (data.rates && data.rates[to_currency]) {
+          const convertedAmount = data.rates[to_currency].toFixed(2);
+          document.getElementById("result").textContent = `${amount} ${from_currency} = ${convertedAmount} ${to_currency}`;
+          document.getElementById("error").textContent = "";
+        } else {
+          document.getElementById("result").textContent = "";
+          document.getElementById("error").textContent = "Error: Invalid currency or amount.";
+        }
+      } catch (error) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("result").textContent = "";
+        document.getElementById("error").textContent = `Error: ${error.message}`;
+      }
+    });
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
